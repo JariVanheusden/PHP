@@ -1,17 +1,30 @@
 <?php
 session_start();
 
-function canLogin($email, $password) {
-    return $email === "jenaam@shop.com" && $password === "12345isnotsecure";
+$host = "localhost";
+$dbname = "f1_shop";
+$user = "root";
+$pass = "";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database verbinding mislukt: " . $e->getMessage());
 }
 
 if (!empty($_POST)) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    if (canLogin($email, $password)) {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+    $stmt->execute(['email' => $email]);
+    $user = $stmt->fetch();
+
+    if ($user && password_verify($password, $user['password_hash'])) {
         $_SESSION['loggedin'] = true;
-        $_SESSION['user'] = $email;
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['role'] = $user['role'];
         header("Location: index.php");
         exit;
     } else {

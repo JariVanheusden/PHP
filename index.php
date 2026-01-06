@@ -4,6 +4,13 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: login.php");
     exit;
 }
+
+$host = "localhost";
+$dbname = "f1_shop";
+$user = "root";
+$pass = "";
+
+$pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
 ?>
 <!DOCTYPE html>
 <html lang="nl">
@@ -27,27 +34,34 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 <div class="content">
     <h2>Populaire Collecties</h2>
 
+    <div style="margin-bottom:20px;">
+        <a href="index.php">Alles</a> |
+        <a href="index.php?category=T-shirt">T-shirts</a> |
+        <a href="index.php?category=Jassen">Jassen</a> |
+        <a href="index.php?category=Petten">Petten</a> |
+        <a href="index.php?category=Accessoires">Accessoires</a>
+    </div>
+
+<?php
+if (isset($_GET['category'])) {
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE category = :category");
+    $stmt->execute(['category' => $_GET['category']]);
+} else {
+    $stmt = $pdo->query("SELECT * FROM products");
+}
+
+$products = $stmt->fetchAll();
+?>
+
     <div class="product-grid">
+    <?php foreach ($products as $product): ?>
         <div class="product-card">
-            <div class="product-img img-mclaren"></div>
-            <h3>McLaren Jas</h3>
-            <p class="price">€129,95</p>
-            <button class="btn-small">Bekijk</button>
+            <div class="product-img" style="background-image:url('images/<?php echo htmlspecialchars($product['image']); ?>');"></div>
+            <h3><?php echo htmlspecialchars($product['name']); ?></h3>
+            <p class="price">€<?php echo number_format($product['price'], 2); ?></p>
+        <a href="product.php?id=<?php echo $product['id']; ?>" class="btn-small">Bekijk</a>
         </div>
-
-        <div class="product-card">
-            <div class="product-img img-ferrari"></div>
-            <h3>Ferrari T-shirt</h3>
-            <p class="price">€49,95</p>
-            <button class="btn-small">Bekijk</button>
-        </div>
-
-        <div class="product-card">
-            <div class="product-img img-aston"></div>
-            <h3>Aston Martin Pet</h3>
-            <p class="price">€34,95</p>
-            <button class="btn-small">Bekijk</button>
-        </div>
+    <?php endforeach; ?>
     </div>
 </div>
 
