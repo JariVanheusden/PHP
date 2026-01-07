@@ -4,7 +4,9 @@ require_once "classes/Database.php";
 require_once "classes/User.php";
 
 $db = new Database();
-$userObj = new User($db->pdo);
+$pdo = $db->pdo;
+
+$userObj = new User($pdo);
 
 $error = "";
 
@@ -12,15 +14,14 @@ if (!empty($_POST)) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    if ($userObj->login($email, $password)) {
+    if ($userObj->register($email, $password)) {
         $_SESSION['loggedin'] = true;
         $_SESSION['user_id'] = $userObj->id;
         $_SESSION['role'] = $userObj->role;
-
         header("Location: index.php");
         exit;
     } else {
-        $error = "Onjuiste combinatie van e-mailadres en wachtwoord.";
+        $error = "Dit e-mailadres is al in gebruik.";
     }
 }
 ?>
@@ -28,26 +29,26 @@ if (!empty($_POST)) {
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>F1 Shop - Login</title>
+    <title>F1 Shop - Registreren</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="login-container">
-    <h2>Inloggen bij F1 Shop</h2>
-    <?php if($error): ?>
+    <h2>Registreren bij F1 Shop</h2>
+
+    <?php if ($error): ?>
         <div class="error"><?php echo $error; ?></div>
     <?php endif; ?>
-    <form action="" method="post">
-        <div class="form-field">
-            <label>Email</label>
-            <input type="email" name="email" required>
-        </div>
-        <div class="form-field">
-            <label>Wachtwoord</label>
-            <input type="password" name="password" required>
-        </div>
-        <input type="submit" value="Inloggen" class="btn">
+
+    <form method="post">
+        <label>Email</label><br>
+        <input type="email" name="email" required><br><br>
+        <label>Wachtwoord</label><br>
+        <input type="password" name="password" required><br><br>
+        <input type="submit" value="Registreren" class="btn">
     </form>
+
+    <p>Heb je al een account? <a href="login.php">Log hier in</a></p>
 </div>
 </body>
 </html>

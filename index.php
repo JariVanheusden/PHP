@@ -5,19 +5,21 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-$host = "localhost";
-$dbname = "f1_shop";
-$user = "root";
-$pass = "";
+require_once "classes/Database.php";
+require_once "classes/Product.php";
 
-$pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+$db = new Database();
+$productObj = new Product($db->pdo);
+
+$category = $_GET['category'] ?? null;
+$products = $productObj->getAll($category);
 ?>
 <!DOCTYPE html>
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
     <title>F1 Shop - Home</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -42,26 +44,19 @@ $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
         <a href="index.php?category=Accessoires">Accessoires</a>
     </div>
 
-<?php
-if (isset($_GET['category'])) {
-    $stmt = $pdo->prepare("SELECT * FROM products WHERE category = :category");
-    $stmt->execute(['category' => $_GET['category']]);
-} else {
-    $stmt = $pdo->query("SELECT * FROM products");
-}
-
-$products = $stmt->fetchAll();
-?>
-
     <div class="product-grid">
-    <?php foreach ($products as $product): ?>
-        <div class="product-card">
-            <div class="product-img" style="background-image:url('images/<?php echo htmlspecialchars($product['image']); ?>');"></div>
-            <h3><?php echo htmlspecialchars($product['name']); ?></h3>
-            <p class="price">€<?php echo number_format($product['price'], 2); ?></p>
-        <a href="product.php?id=<?php echo $product['id']; ?>" class="btn-small">Bekijk</a>
-        </div>
-    <?php endforeach; ?>
+        <?php if (!empty($products)): ?>
+            <?php foreach ($products as $product): ?>
+                <div class="product-card">
+                    <div class="product-img" style="background-image: url('images/<?php echo htmlspecialchars($product['image']); ?>');"></div>
+                    <h3><?php echo htmlspecialchars($product['name']); ?></h3>
+                    <p class="price">€<?php echo number_format($product['price'], 2); ?></p>
+                    <a href="product.php?id=<?php echo $product['id']; ?>" class="btn-small">Bekijk</a>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>Geen producten gevonden in deze categorie.</p>
+        <?php endif; ?>
     </div>
 </div>
 
