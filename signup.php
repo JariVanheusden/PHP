@@ -10,6 +10,11 @@ $userObj = new User($pdo);
 
 $error = "";
 
+if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+    header("Location: index.php");
+    exit;
+}
+
 if (!empty($_POST)) {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -41,10 +46,16 @@ if (!empty($_POST)) {
     <?php endif; ?>
 
     <form method="post">
-        <label>Email</label><br>
-        <input type="email" name="email" required><br><br>
-        <label>Wachtwoord</label><br>
-        <input type="password" name="password" required><br><br>
+        <div class="form-field">
+            <label>Email</label>
+            <input type="email" name="email" required>
+        </div>
+
+        <div class="form-field">
+            <label>Wachtwoord</label>
+            <input type="password" name="password" required>
+        </div>
+
         <input type="submit" value="Registreren" class="btn">
     </form>
 
