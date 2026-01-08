@@ -8,6 +8,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 require_once "classes/Database.php";
 require_once "classes/Product.php";
 
+$currentCategory = $_GET['category'] ?? 'all';
+
 $db = new Database();
 $productObj = new Product($db->pdo);
 
@@ -36,13 +38,31 @@ $products = $productObj->getAll($category);
 <div class="content">
     <h2>Populaire Collecties</h2>
 
-    <div style="margin-bottom:20px;">
-        <a href="index.php">Alles</a> |
-        <a href="index.php?category=T-shirt">T-shirts</a> |
-        <a href="index.php?category=Jassen">Jassen</a> |
-        <a href="index.php?category=Petten">Petten</a> |
-        <a href="index.php?category=Accessoires">Accessoires</a>
-    </div>
+    <div class="category-nav">
+    <a href="index.php" class="<?= $currentCategory === 'all' ? 'active' : '' ?>">Alles</a>
+
+    <a href="index.php?category=T-shirt"
+       class="<?= $currentCategory === 'T-shirt' ? 'active' : '' ?>">
+       T-shirts
+    </a>
+
+    <a href="index.php?category=Jassen"
+       class="<?= $currentCategory === 'Jassen' ? 'active' : '' ?>">
+       Jassen
+    </a>
+
+    <a href="index.php?category=Petten"
+       class="<?= $currentCategory === 'Petten' ? 'active' : '' ?>">
+       Petten
+    </a>
+
+    <a href="index.php?category=Accessoires"
+       class="<?= $currentCategory === 'Accessoires' ? 'active' : '' ?>">
+       Accessoires
+    </a>
+</div>
+
+
 
     <div class="product-grid">
         <?php if (!empty($products)): ?>
