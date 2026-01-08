@@ -11,12 +11,28 @@ $db = new Database();
 $productObj = new Product($db->pdo);
 
 if (isset($_POST['add'])) {
-    $productObj->add($_POST);
+    $productData = [
+        'name' => $_POST['name'] ?? '',
+        'price' => $_POST['price'] ?? 0,
+        'category' => $_POST['category'] ?? '',
+        'description' => $_POST['description'] ?? '',
+        'image' => $_POST['image'] ?? ''
+    ];
+    $productObj->add($productData);
 }
 
+
 if (isset($_POST['edit'])) {
-    $productObj->update($_POST['id'], $_POST);
+    $productData = [
+        'name' => $_POST['name'] ?? '',
+        'price' => $_POST['price'] ?? 0,
+        'category' => $_POST['category'] ?? '',
+        'description' => $_POST['description'] ?? '',
+        'image' => $_POST['image'] ?? ''
+    ];
+    $productObj->update($_POST['id'], $productData);
 }
+
 
 if (isset($_POST['delete'])) {
     $productObj->delete($_POST['delete']);
